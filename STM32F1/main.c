@@ -63,11 +63,19 @@ static u32 checkReset()
 #ifdef BL_BUTTON_ALWAYS_WORKS
 	return checkUserJump(SW_ONLY) | (RCC->CSR & (RESET_ACTIVATION));
 #else
+#if 0
+        if (RCC->CSR & 2) {
+            // Reset from suspend. Check RTC alarm.
+            if RTC->CLR
+        }
+#error
+#else
 	return ((RCC->CSR) & (RESET_ACTIVATION));
+#endif
 #endif
 }
 
-int main() 
+int main()
 {
     int bl_start = 0;
     int bl_active = 0;
@@ -75,85 +83,94 @@ int main()
     systemReset();  // peripherals but not PC
     setupCLK(); 	// not USB, that is handled by USB portion
     setupLEDAndButton();
-
-	// determine our reset method to see if we should even use the bootloader
-	// NOTE: user must set RCC->CSR bit 24, otherwise this may always succeed
-	if (checkReset()) {
-		// do the startup LED quickflash
+#ifdef EXTRA_INIT
+    do {
+        EXTRA_INIT
+    } while (0);
+#endif
+    // determine our reset method to see if we should even use the bootloader
+    // NOTE: user must set RCC->CSR bit 24, otherwise this may always succeed
+    if (checkReset()) {
+        // do the startup LED quickflash
 #ifndef DISABLE_STARTUP_FAST_BLINK
-	 	strobePin(LED_BANK, LED_PIN, STARTUP_BLINKS, BLINK_FAST, LED_ON_STATE);
+        strobePin(LED_BANK, LED_PIN, STARTUP_BLINKS, BLINK_FAST, LED_ON_STATE);
 #endif
 
-	 	// see if we should enter the bootloader....
+        // see if we should enter the bootloader....
 #if (BOOTLOADER_WAIT == 0)
-		// as there is no wait defined, there must a switch or other method to get
-		// into the bootloader. we don't even want to activate it for a brief moment,
-		// so only activate if the button is held high or no code is in user flash
-	 	bl_start = checkUserJump(SW_OR_FLASH);
+        // as there is no wait defined, there must a switch or other method to get
+        // into the bootloader. we don't even want to activate it for a brief moment,
+        // so only activate if the button is held high or no code is in user flash
+        bl_start = checkUserJump(SW_OR_FLASH);
 #else
-	 	// load the bootloader for the specified bootloader wait time
-	 	// this is specified in config.h for the selected platform
-	 	bl_start = 1;
+        // load the bootloader for the specified bootloader wait time
+        // this is specified in config.h for the selected platform
+        bl_start = 1;
 #endif
- 	} else {
- 		// even if invalid reset, if for some reason the flash is corrupted,
- 		// we need to enter the bootloader. in this case, we get no quickflash =)
- 		bl_start = checkUserJump(FLASH_ONLY);
- 	}
+    } else {
+        // even if invalid reset, if for some reason the flash is corrupted,
+        // we need to enter the bootloader. in this case, we get no quickflash =)
+        bl_start = checkUserJump(FLASH_ONLY);
+    }
 
-	if (bl_start) {
-		// for some reason we've entered the bootloader
-		// if a button is pushed, or we don't have valid code in flash,
-		// we want to stay in the bootloader
-		bl_active = checkUserJump(SW_OR_FLASH);
+    if (bl_start) {
+        // for some reason we've entered the bootloader
+        // if a button is pushed, or we don't have valid code in flash,
+        // we want to stay in the bootloader
+        bl_active = checkUserJump(SW_OR_FLASH);
 
-		// only set up USB and flash if in the bootloader (as we are now)
-		setupUSB();
-    	setupFLASH();
+        // only set up USB and flash if in the bootloader (as we are now)
+        setupUSB();
+        setupFLASH();
 
-    	// stay in the bootloader if we're waiting, or if we're forced active
-    	int bl_wait = BOOTLOADER_WAIT;
-    	while (bl_wait || bl_active) {
-    		if (bl_wait) bl_wait--;
+        // stay in the bootloader if we're waiting, or if we're forced active
+        int bl_wait = BOOTLOADER_WAIT;
+        while (bl_wait || bl_active) {
+            if (bl_wait) bl_wait--;
 
-	        // is DFU in progress?
-	        if (dfuUploadStarted()) {
-	        	// wait until we're done
-	        	while (!dfuUploadDone());
-	        	// success flash, we also need to wait a little longer for manifest to be sent
-	        	// otherwise it will be successful but we'll get "unable to read DFU status" error
+            // is DFU in progress?
+            if (dfuUploadStarted()) {
+                // wait until we're done
+                while (!dfuUploadDone());
+                // success flash, we also need to wait a little longer for manifest to be sent
+                // otherwise it will be successful but we'll get "unable to read DFU status" error
 
-	        	// flashing faster once we're done takes time, this serves as our wait
-	        	strobePin(LED_BANK, LED_PIN, STARTUP_BLINKS, BLINK_FAST, LED_ON_STATE);
+                // flashing faster once we're done takes time, this serves as our wait
+#if defined(LED_BANK) && defined(LED_PIN) && defined(LED_ON_STATE)
+                strobePin(LED_BANK, LED_PIN, STARTUP_BLINKS, BLINK_FAST, LED_ON_STATE);
+#endif
+                // uncomment the following line if you always want to execute code after completion
+                // break;
 
-	            // uncomment the following line if you always want to execute code after completion
-	            // break;
+                // uncomment the following line if you only want to stay in the bootloader if
+                // the switch is still pressed (used for toggle switches). deactivating the
+                // switch will then start the program. used for user-initiated code start
+                bl_active = checkUserJump(SW_ONLY);
 
-	            // uncomment the following line if you only want to stay in the bootloader if
-	            // the switch is still pressed (used for toggle switches). deactivating the
-	            // switch will then start the program. used for user-initiated code start
-	            bl_active = checkUserJump(SW_ONLY);
+                // uncomment no lines if you want to stay in the bootloader after loading code
+                // keep in mind that the DFU state machine is broken so there's no point, really
+            } else {
+                // while in bootloader, flash the LED slowly
+#if defined(LED_BANK) && defined(LED_PIN) && defined(LED_ON_STATE)
+                strobePin(LED_BANK, LED_PIN, 1, BLINK_SLOW, LED_ON_STATE);
+#endif
+            }
+        }
+    }
 
-	            // uncomment no lines if you want to stay in the bootloader after loading code
-	            // keep in mind that the DFU state machine is broken so there's no point, really
-	        } else {
-	        	// while in bootloader, flash the LED slowly
-	        	strobePin(LED_BANK, LED_PIN, 1, BLINK_SLOW, LED_ON_STATE);
-	        }
-	    }
-	}
+    if (checkUserCode(USER_CODE_FLASH0X8002000))  {
+        jumpToUser(USER_CODE_FLASH0X8002000);
+    } else {
+        if (checkUserCode(USER_CODE_FLASH0X8005000)) {
+            jumpToUser(USER_CODE_FLASH0X8005000);
+        }  else {
+            // Nothing to execute in either Flash or RAM
+#if defined(LED_BANK) && defined(LED_PIN) && defined(LED_ON_STATE)
+            strobePin(LED_BANK, LED_PIN, 10, BLINK_FAST, LED_ON_STATE);
+#endif
+            systemHardReset();
+        }
+    }
 
-	if (checkUserCode(USER_CODE_FLASH0X8002000))  {
-		jumpToUser(USER_CODE_FLASH0X8002000);
-	} else {
-		if (checkUserCode(USER_CODE_FLASH0X8005000)) {
-			jumpToUser(USER_CODE_FLASH0X8005000);
-		}  else {
-			// Nothing to execute in either Flash or RAM
-			strobePin(LED_BANK, LED_PIN, 10, BLINK_FAST, LED_ON_STATE);
-			systemHardReset();
-		}
-	}
-
-	return 0;
+    return 0;
 }

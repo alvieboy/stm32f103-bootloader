@@ -128,6 +128,16 @@ generic-pe5: begin gccversion build_generic-pe5 sizeafter finished  copy_generic
 generic-pe5-button-pa0: begin gccversion build_generic-pe5-button-pa0 sizeafter finished  copy_generic-pe5-button-pa0 end
 generic-pb7: begin gccversion build_generic-pb7 sizeafter finished  copy_generic-pb7 end
 generic-pb0: begin gccversion build_generic-pb0 sizeafter finished  copy_generic-pb0 end
+generic-stmlora: begin gccversion build_stmlora sizeafter finished  copy_stmlora end
+
+psu: begin gccversion build_psu sizeafter finished  copy_psu end
+stmcam: begin gccversion build_stmcam sizeafter finished  copy_stmcam end
+lmi: begin gccversion build_lmi sizeafter finished  copy_lmi end
+lmipanel: begin gccversion build_lmipanel sizeafter finished  copy_lmipanel end
+
+generic-pb12-pb15: begin gccversion build_pb12_pb15 sizeafter finished  copy_pb12_pb15 end
+
+generic-gatusa: begin gccversion build_gatusa sizeafter finished  copy_gatusa end
 stbee :  begin gccversion build_stbee sizeafter finished  copy_stbee end
 naze32: begin gccversion build_naze32 sizeafter finished  copy_naze32 end
 andnxor-dc24-bender: begin gccversion build_andnxor-dc24-bender sizeafter finished  copy_andnxor-dc24-bender end
@@ -180,6 +190,95 @@ copy_generic-pc13:
 	@echo
 	cp $(TARGET).bin binaries/dfu_boot20_generic_pc13.bin
 	@echo	
+
+build_generic-pc13-inv: TARGETFLAGS= -DTARGET_GENERIC_F103_PC13_INV
+# Set the linker script
+build_generic-pc13-inv: LDFLAGS +=-T$(ST_LIB)/c_only_md_high_density.ld
+build_generic-pc13-inv: elf bin lss sym
+copy_generic-pc13-inv: 
+	@echo
+	@echo "Copying to binaries folder"
+	@echo
+	cp $(TARGET).bin binaries/dfu_boot20_generic_pc13.bin
+	@echo	
+
+build_generic-pa13: TARGETFLAGS= -DTARGET_GENERIC_F103_PA13
+# Set the linker script
+build_generic-pa13: LDFLAGS +=-T$(ST_LIB)/c_only_md_high_density.ld
+build_generic-pa13: elf bin lss sym
+copy_generic-pa13: 
+	@echo
+	@echo "Copying to binaries folder"
+	@echo
+	cp $(TARGET).bin binaries/dfu_boot20_generic_pa13.bin
+	@echo	
+
+build_stmlora: TARGETFLAGS= -DTARGET_STMLORA
+# Set the linker script
+build_stmlora: LDFLAGS +=-T$(ST_LIB)/c_only_md_high_density.ld
+build_stmlora: elf bin lss sym
+copy_stmlora: 
+	@echo
+	@echo "Copying to binaries folder"
+	@echo
+	cp $(TARGET).bin binaries/dfu_boot20_stmlora.bin
+	@echo	
+
+build_lmi: TARGETFLAGS= -DTARGET_LMI
+# Set the linker script
+build_lmi: LDFLAGS +=-T$(ST_LIB)/c_only_md_high_density.ld
+build_lmi: elf bin lss sym
+copy_lmi: 
+	@echo
+	@echo "Copying to binaries folder"
+	@echo
+	cp $(TARGET).bin binaries/dfu_boot20_lmi.bin
+	@echo	
+
+build_lmipanel: TARGETFLAGS= -DTARGET_LMIPANEL
+# Set the linker script
+build_lmipanel: LDFLAGS +=-T$(ST_LIB)/c_only_md_high_density.ld
+build_lmipanel: elf bin lss sym
+copy_lmipanel: 
+	@echo
+	@echo "Copying to binaries folder"
+	@echo
+	cp $(TARGET).bin binaries/dfu_boot20_lmipanel.bin
+	@echo	
+
+build_psu: TARGETFLAGS= -DTARGET_PSU
+# Set the linker script
+build_psu: LDFLAGS +=-T$(ST_LIB)/c_only_md_high_density.ld
+build_psu: elf bin lss sym
+copy_psu: 
+	@echo
+	@echo "Copying to binaries folder"
+	@echo
+	cp $(TARGET).bin binaries/dfu_boot20_psu.bin
+	@echo	
+
+build_pb12_pb15: TARGETFLAGS= -DTARGET_GENERIC_F103_PB12_PB15
+# Set the linker script
+build_pb12_pb15: LDFLAGS +=-T$(ST_LIB)/c_only_md_high_density.ld
+build_pb12_pb15: elf bin lss sym
+copy_pb12_pb15: 
+	@echo
+	@echo "Copying to binaries folder"
+	@echo
+	cp $(TARGET).bin binaries/dfu_boot20_pb12_pb15.bin
+	@echo	
+
+build_gatusa: TARGETFLAGS= -DTARGET_GATUSA
+# Set the linker script
+build_gatusa: LDFLAGS +=-T$(ST_LIB)/c_only_md_high_density.ld
+build_gatusa: elf bin lss sym
+copy_gatusa: 
+	@echo
+	@echo "Copying to binaries folder"
+	@echo
+	cp $(TARGET).bin binaries/dfu_boot20_gatusa.bin
+	@echo	
+
 	
 build_generic-pg15: TARGETFLAGS= -DTARGET_GENERIC_F103_PG15
 # Set the linker script

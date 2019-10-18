@@ -66,6 +66,7 @@
 #define CR_OUTPUT_PP	0x01	
 #define CR_INPUT 	  	0x04
 #define CR_INPUT_PU_PD	0x08
+#define CR_OUTPUT_AF_PP	0x83
 
 #define SCS_BASE   ((u32)0xE000E000)
 #define NVIC_BASE  (SCS_BASE + 0x0100)

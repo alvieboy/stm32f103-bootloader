@@ -96,7 +96,8 @@ void setupCLK(void)
     // Enable All GPIO channels (A to E), AFIO clock; disable any other clocks
     RCC->APB2ENR = 0x0000007d;
     // disable JTAG pins
-    REG_SET(AFIO_MAPR, AFIO_MAPR_SWJ_CFG_NO_JTAG_SW);
+    REG_SET(AFIO_MAPR, AFIO_MAPR_SWJ_CFG_NO_JTAG_NO_SW);
+
 }
 
 
@@ -121,9 +122,11 @@ void setupLEDAndButton (void)
     gpio_write_bit(LED_BANK, LED_PIN_K, 0);
 #endif
 
+#if defined(LED_BANK) && defined(LED_PIN) && defined(LED_ON_STATE)
     // configure LED
     REG_SET(GPIO_CR(LED_BANK, LED_PIN),
-        (REG_GET(GPIO_CR(LED_BANK, LED_PIN)) & crMask(LED_PIN)) | CR_OUTPUT_PP << CR_SHIFT(LED_PIN));
+            (REG_GET(GPIO_CR(LED_BANK, LED_PIN)) & crMask(LED_PIN)) | CR_OUTPUT_PP << CR_SHIFT(LED_PIN));
+#endif
 }
 
 void setupFLASH()

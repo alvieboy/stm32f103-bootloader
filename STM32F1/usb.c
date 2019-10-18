@@ -108,7 +108,7 @@ static RCC_TypeDef *RCC = (RCC_TypeDef *)RCC_BASE;
 void setupUSB (void)
 {
 #ifndef USB_DISC_HARDWIRED
-#ifdef HAS_MAPLE_HARDWARE	
+# ifdef HAS_MAPLE_HARDWARE
     // set up USB DISC pin as output open drain
     gpio_write_bit(USB_DISC_BANK, USB_DISC_PIN, 1);
     REG_SET(GPIO_CR(USB_DISC_BANK, USB_DISC_PIN),
@@ -116,9 +116,7 @@ void setupUSB (void)
                 GPIO_CR(USB_DISC_BANK,USB_DISC_PIN)) & crMask(USB_DISC_PIN))
                 | CR_OUTPUT_OD << CR_SHIFT(USB_DISC_PIN)
             );
-#else
-    #ifndef USB_DISC_HARDWIRED
-    
+# else
     // Generic boards don't have disconnect hardware, so we drive PA12 (or defined pin) high.
     // this is connected to the usb D+ line. driving high will signal usb full speed to host
     #ifndef USB_DISC_BANK
@@ -141,9 +139,46 @@ void setupUSB (void)
     volatile u32 delay;
     for(delay = 256; delay; delay--);
 
+# endif // HAS_MAPLE_HARDWARE
+#else // ELSE
+    // Force both lines to 0.
+
+    #ifndef USB_DISC_BANK
+    #define USB_DISC_BANK   GPIOA
     #endif
+
+    #ifndef USB_DISC_PIN  
+    #define USB_DISC_PIN    12
+    #endif
+
+    gpio_write_bit(GPIOA, 11, 0);
+    gpio_write_bit(GPIOA, 12, 0);
+    REG_SET(GPIO_CR(GPIOA, 11),
+            (REG_GET(
+                     GPIO_CR(GPIOA, 11)) & crMask(11))
+            | CR_OUTPUT_PP << CR_SHIFT(11)
+           );
+    REG_SET(GPIO_CR(GPIOA, 12),
+            (REG_GET(
+                     GPIO_CR(GPIOA, 12)) & crMask(12))
+            | CR_OUTPUT_PP << CR_SHIFT(12)
+           );
+
+    volatile u32 delay;
+    for(delay = 8192; delay; delay--);
+#if 0
+    REG_SET(GPIO_CR(GPIOA, 11),
+            (REG_GET(
+                     GPIO_CR(GPIOA, 11)) & crMask(11))
+            | CR_OUTPUT_AF_PP << CR_SHIFT(11)
+           );
+    REG_SET(GPIO_CR(GPIOA, 12),
+            (REG_GET(
+                     GPIO_CR(GPIOA, 12)) & crMask(12))
+            | CR_OUTPUT_AF_PP << CR_SHIFT(12)
+           );
 #endif
-#endif
+#endif // NOT USB_DISC_HARDWIRED
 
   // initialize the usb application  
   wTransferSize = getFlashPageSize();

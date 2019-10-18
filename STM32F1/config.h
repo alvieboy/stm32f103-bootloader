@@ -44,11 +44,10 @@
 // default wait times in blink_slow periods if not explicitly defined
 #define WAIT_SHORT 					4
 #define WAIT_LONG 					15
-
 // how many blinks do we do at startup, and before checking user input?
 #define STARTUP_BLINKS 				4
 // uncomment the next line to not do the fast blink at startup
-// #define DISABLE_STARTUP_FAST_BLINK
+#define DISABLE_STARTUP_FAST_BLINK
 
 // do we enter bootloader on certain reset methods only?
 #define RESET_ACTIVATION 			(RESET_POR | RESET_EXT)
@@ -157,6 +156,139 @@
 	#define BUTTON_ON_STATE  1
 	
 	
+#elif defined TARGET_GENERIC_F103_PC13_INV
+	
+	#define LED_BANK		 GPIOC 
+	#define LED_PIN 	 	 13
+	#define LED_ON_STATE	 0
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOC
+	#define BUTTON_PIN       14
+	#define BUTTON_ON_STATE  0
+
+#elif defined TARGET_GENERIC_F103_PA13
+	
+	#define LED_BANK		 GPIOA
+	#define LED_PIN 	 	 13
+	#define LED_ON_STATE     1
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOC
+	#define BUTTON_PIN       14
+	#define BUTTON_ON_STATE  0
+
+#elif defined TARGET_GENERIC_F103_PB12_PB15
+
+	#define LED_BANK		 GPIOB
+	#define LED_PIN 	 	 12
+	#define LED_ON_STATE     0
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOB
+	#define BUTTON_PIN       15
+	#define BUTTON_ON_STATE  0
+
+#       define USB_DISC_PULLDOWN 1
+#       define USB_DISC_HARDWIRED 1
+
+#elif defined TARGET_STMLORA
+
+	#define BOOTLOADER_WAIT  0
+
+	//#define LED_BANK		 GPIOA
+	//#define LED_PIN 	 	 13
+	//#define LED_ON_STATE     1
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOC
+	#define BUTTON_PIN       13
+	#define BUTTON_ON_STATE  0
+
+#       define USB_DISC_PULLDOWN 1
+#       define USB_DISC_HARDWIRED 1
+	
+#elif defined TARGET_GATUSA
+
+	#define BOOTLOADER_WAIT  0
+
+	#define LED_BANK		 GPIOA
+	#define LED_PIN 	 	 13
+	#define LED_ON_STATE     1
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOC
+	#define BUTTON_PIN       14
+	#define BUTTON_ON_STATE  0
+
+#       define USB_DISC_PULLDOWN 1
+#       define USB_DISC_HARDWIRED 1
+
+#elif defined TARGET_LMIPANEL
+
+	#define BOOTLOADER_WAIT  0
+
+	#define LED_BANK		 GPIOA
+	#define LED_PIN 	 	 13
+	#define LED_ON_STATE     0
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOC
+	#define BUTTON_PIN       14
+	#define BUTTON_ON_STATE  0
+
+#       define USB_DISC_PULLDOWN 1
+#       define USB_DISC_HARDWIRED 1
+
+#elif defined TARGET_PSU
+
+	#define BOOTLOADER_WAIT  1
+
+	#define LED_BANK		 GPIOA
+	#define LED_PIN 	 	 13
+	#define LED_ON_STATE     1
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOC
+	#define BUTTON_PIN       14
+	#define BUTTON_ON_STATE  0
+
+#define USB_DISC_PULLDOWN 1
+#define USB_DISC_HARDWIRED 1
+
+#elif defined TARGET_STMCAM
+
+	#define LED_BANK		 GPIOB
+	#define LED_PIN 	 	 1
+        #define LED_ON_STATE             0
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOC
+	#define BUTTON_PIN       13
+	#define BUTTON_ON_STATE  0
+
+#undef USB_DISC_HARDWIRED
+#define USB_DISC_BANK GPIOA
+#define USB_DISC_PIN  14
+
+#define EXTRA_INIT
+
+#elif defined TARGET_LMI
+
+	#define LED_BANK		 GPIOB
+	#define LED_PIN 	 	 1
+        #define LED_ON_STATE             0
+
+	// Button (if you have one)
+	#define BUTTON_BANK      GPIOC
+	#define BUTTON_PIN       13
+	#define BUTTON_ON_STATE  0
+
+#undef USB_DISC_HARDWIRED
+#define USB_DISC_BANK GPIOB
+#define USB_DISC_PIN  5
+#define HAS_MAPLE_HARDWARE
+
 #elif defined TARGET_GENERIC_F103_PG15
 	
 	#define LED_BANK		 GPIOG 
